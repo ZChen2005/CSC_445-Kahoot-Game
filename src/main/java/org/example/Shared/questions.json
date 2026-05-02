@@ -1,0 +1,102 @@
+[
+  {
+    "text": "How many states are in the United States?",
+    "options": [
+      "A: 48",
+      "B: 52",
+      "C: 50",
+      "D: 51"
+    ],
+    "answer": "C"
+  },
+  {
+    "text": "What is the capital of France?",
+    "options": [
+      "A: Rome",
+      "B: Madrid",
+      "C: Berlin",
+      "D: Paris"
+    ],
+    "answer": "D"
+  },
+  {
+    "text": "How many continents are there on Earth?",
+    "options": [
+      "A: 5",
+      "B: 6",
+      "C: 7",
+      "D: 8"
+    ],
+    "answer": "C"
+  },
+  {
+    "text": "What is the largest planet in our solar system?",
+    "options": [
+      "A: Saturn",
+      "B: Jupiter",
+      "C: Neptune",
+      "D: Uranus"
+    ],
+    "answer": "B"
+  },
+  {
+    "text": "How many sides does a hexagon have?",
+    "options": [
+      "A: 5",
+      "B: 7",
+      "C: 8",
+      "D: 6"
+    ],
+    "answer": "D"
+  },
+  {
+    "text": "What is the fastest land animal?",
+    "options": [
+      "A: Lion",
+      "B: Horse",
+      "C: Cheetah",
+      "D: Leopard"
+    ],
+    "answer": "C"
+  },
+  {
+    "text": "How many hours are in a day?",
+    "options": [
+      "A: 12",
+      "B: 24",
+      "C: 48",
+      "D: 36"
+    ],
+    "answer": "B"
+  },
+  {
+    "text": "What is the chemical symbol for water?",
+    "options": [
+      "A: WA",
+      "B: HO",
+      "C: H2O",
+      "D: OX"
+    ],
+    "answer": "C"
+  },
+  {
+    "text": "Which ocean is the largest?",
+    "options": [
+      "A: Atlantic",
+      "B: Indian",
+      "C: Arctic",
+      "D: Pacific"
+    ],
+    "answer": "D"
+  },
+  {
+    "text": "How many players are on a football team on the field?",
+    "options": [
+      "A: 10",
+      "B: 12",
+      "C: 11",
+      "D: 9"
+    ],
+    "answer": "C"
+  }
+]
