@@ -18,14 +18,14 @@ public class GameConfig {
 
     // Players
     /** Exact number of players required to start the game. */
-    public static final int MAX_PLAYERS = 3;
+    public static final int MAX_PLAYERS = 2;
 
     /** Maximum characters allowed in a player nickname. */
     public static final int MAX_NICKNAME_LENGTH = 16;
 
     // Questions
     /** Path to the JSON file containing all questions (relative to server working dir). */
-    public static final String QUESTIONS_FILE = "resources/questions.json";
+    public static final String QUESTIONS_FILE = "src/main/resources/questions.json";
 
     /** How many seconds each player has to answer a question. */
     public static final int QUESTION_TIMER_SECONDS = 15;

@@ -3,14 +3,14 @@ package org.example.Client;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.example.Server.ScoreBoard.PlayerScore;
-import org.example.shared.Message;
-import org.example.shared.Question;
+import org.example.Shared.Message;
+import org.example.Shared.Question;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.PrintWriter;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -50,8 +50,8 @@ public class ClientGUI {
 
     // ── Fields ────────────────────────────────────────────
     private final String      nickname;
-    private final PrintWriter out;
-    private final Gson        gson;
+    private final org.example.Server.GameManager gameManager;
+    private final Gson gson = new Gson();
 
     private JFrame     frame;
     private JPanel     mainPanel;
@@ -75,10 +75,11 @@ public class ClientGUI {
     private static final String S_SCORE = "SCORE";
 
     // ─────────────────────────────────────────────────────
-    public ClientGUI(String nickname, PrintWriter out, Gson gson) {
+    public ClientGUI(String nickname, org.example.Server.GameManager gameManager) {
         this.nickname = nickname;
-        this.out      = out;
-        this.gson     = gson;
+        this.gameManager = gameManager;
+        
+        
         try { UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); }
         catch (Exception ignored) {}
         buildUI();
@@ -119,16 +120,16 @@ public class ClientGUI {
         JLabel dot = new JLabel("◆", SwingConstants.CENTER);
         dot.setFont(new Font("SansSerif", Font.PLAIN, 40));
         dot.setForeground(ACCENT);
-        dot.setAlignmentX(CENTER_ALIGNMENT);
+        dot.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel title = label("KahootJava", F_TITLE, TEXT_PRI);
-        title.setAlignmentX(CENTER_ALIGNMENT);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         waitingLabel = label("Waiting...", F_BODY, TEXT_SEC);
-        waitingLabel.setAlignmentX(CENTER_ALIGNMENT);
+        waitingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel you = label("Playing as: " + nickname, F_SMALL, ACCENT);
-        you.setAlignmentX(CENTER_ALIGNMENT);
+        you.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         card.add(dot);
         card.add(vgap(10));
@@ -199,7 +200,7 @@ public class ClientGUI {
                 answerButtons[i].setEnabled(true);
                 answerButtons[i].setChosen(false);
             }
-            timerMax = org.example.shared.GameConfig.QUESTION_TIMER_SECONDS;
+            timerMax = org.example.Shared.GameConfig.QUESTION_TIMER_SECONDS;
             timerRing.reset(timerMax);
             cardLayout.show(mainPanel, S_QUEST);
         });
@@ -218,7 +219,7 @@ public class ClientGUI {
         String[] ls = {"A","B","C","D"};
         for (int i = 0; i < 4; i++)
             if (ls[i].equals(letter)) answerButtons[i].setChosen(true);
-        out.println(new Message(Message.ANSWER, letter).toJson());
+        gameManager.submitAnswer(letter);
     }
 
     private void disableAll() {
