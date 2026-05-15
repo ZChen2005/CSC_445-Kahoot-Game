@@ -14,13 +14,13 @@ public class GameManager {
     private final RaftNode       raftNode;
     private final List<Question> questions;
     private final ScoreBoard     scoreBoard;
-    private final Gson           gson       = new Gson();
+    private final Gson           gson = new Gson();
     private final String         myNickname;
 
-    // Answers from ALL players arrive here via GameStateApplier
+    // All answers from ALL players arrive here via GameStateApplier
     private final BlockingQueue<Answer> answerQueue = new LinkedBlockingQueue<>();
 
-    // Collected nicknames from both nodes
+    // Collected nicknames from both nodes via Raft log
     private final java.util.Set<String> registeredNicknames =
             java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
 
@@ -37,14 +37,19 @@ public class GameManager {
     }
 
     public GameManager(RaftNode raftNode, List<Question> questions, String myNickname) {
-        this.raftNode    = raftNode;
-        this.questions   = questions;
-        this.myNickname  = myNickname;
-        this.scoreBoard  = new ScoreBoard();
+        this.raftNode   = raftNode;
+        this.questions  = questions;
+        this.myNickname = myNickname;
+        this.scoreBoard = new ScoreBoard();
+    }
+
+    // ── Called by GUI when this player clicks an answer ───
+    public void submitAnswer(String letter) {
+        // Push into Raft log — GameStateApplier on both nodes will pick it up
+        raftNode.submitCommand("ANSWER:" + myNickname + ":" + letter);
     }
 
     // ── Called by GameStateApplier for every ANSWER log entry ──
-    // Runs on both nodes — only leader uses it for scoring
     public void receiveAnswer(String nickname, String letter, long elapsedMs) {
         answerQueue.offer(new Answer(nickname, letter, elapsedMs));
     }
@@ -55,13 +60,12 @@ public class GameManager {
         System.out.println("[GameManager] Registered nickname: " + nickname);
     }
 
-    // ── Called by GUI when this player clicks an answer ──
-    public void submitAnswer(String letter) {
-        String command = "ANSWER:" + myNickname + ":" + letter;
-        raftNode.submitCommand(command);
+    // ── Returns collected nicknames — used by Main.java ───
+    public java.util.Set<String> getRegisteredNicknames() {
+        return registeredNicknames;
     }
 
-    // ── Main game loop — leader only ──
+    // ── Main game loop — leader only ──────────────────────
     public void start(List<String> allNicknames) {
         scoreBoard.registerPlayers(allNicknames);
 
@@ -84,9 +88,11 @@ public class GameManager {
 
         String finalJson = gson.toJson(scoreBoard.getRankings());
         submitRaft("GAME_OVER", finalJson);
-        System.out.println("[GameManager] Game over! Winner: " + scoreBoard.getWinner().getNickname());
+        System.out.println("[GameManager] Game over! Winner: " +
+                scoreBoard.getWinner().getNickname());
     }
 
+    // ── Single question round ─────────────────────────────
     private void playQuestion(Question question) {
         answerQueue.clear();
 
@@ -95,9 +101,8 @@ public class GameManager {
 
         submitRaft("QUESTION", gson.toJson(question));
 
-        long startTime   = System.currentTimeMillis();
         long timeLimitMs = GameConfig.QUESTION_TIMER_SECONDS * 1000L;
-        long endTime     = startTime + timeLimitMs;
+        long endTime     = System.currentTimeMillis() + timeLimitMs;
 
         while (System.currentTimeMillis() < endTime && answered.size() < expectedPlayers) {
             long remaining = (endTime - System.currentTimeMillis()) / 1000;
@@ -133,6 +138,7 @@ public class GameManager {
         submitRaft("TIMER", "0");
     }
 
+    // ── Raft submit helper ────────────────────────────────
     private void submitRaft(String type, String data) {
         if (raftNode.getRole() != NodeRole.LEADER) return;
         raftNode.submitCommand(type + ":" + data);
@@ -144,8 +150,4 @@ public class GameManager {
     }
 
     public ScoreBoard getScoreBoard() { return scoreBoard; }
-
-    public java.util.Set<String> getRegisteredNicknames() {
-        return registeredNicknames;
-    }
 }
